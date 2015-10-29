@@ -25,7 +25,7 @@ main (int argc, char *argv[])
   int sub[MAX_PROC], run[MAX_PROC];
   int count = 0;
 
-  printf("Submit time:Duration\n");
+  printf("Please use this format: \"Submit time (space) Duration\"\n");
   FILE *f = stdin;
   if (argc > 1)
     {
