@@ -13,5 +13,5 @@ submitted the copy will receive a zero on this assignment.
 
 void rr(int count, int *sub, int *run)
 {
-
+	const int quantum = 100;
 }
