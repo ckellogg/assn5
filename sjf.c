@@ -1,4 +1,4 @@
-//Primary Coder: Cody Kellogg	
+//Primary Coder: Cody Kellogg
 //Group project
 //CS 3060-601 Fall 2015
 //Assignment #5
@@ -9,11 +9,11 @@ exact copy of this source code is found to be used by another person in
 this term, I understand that both myself and the student that submitted
 the copy will receive a zero on this assignment.
 */
- 
+
 #include"assn5.h"
 #include<stdio.h>
-const int INT_MAX = 650000;
-const int array_size = 100;
+const int INT_MAX = 65000000;
+const int array_size = 102;
 const int check = -1;
 
 void sjf (int count, int *sub, int *run)
@@ -43,7 +43,6 @@ void sjf (int count, int *sub, int *run)
       if (queue_count == 0 && sub[next_proc] > clock)
 	{
 	  clock = sub[next_proc];
-//              printf ("reset clock to %d: \n",clock );
 	}
 
       while (clock >= sub[i] && next_proc < count)
@@ -74,8 +73,6 @@ void sjf (int count, int *sub, int *run)
       wait += next_clock - queue[index] - time[index];
 
       clock = next_clock;
-//printf ("%d: %d :%.2f, %.2f, %.2f\n",index, next_proc,(float) resp / proc_left, (float) ta / proc_left, (float) wait / proc_left); 
-//printf ("%d: %d :%.2f, %.2f, %.2f\n",index, next_proc,(float) resp , (float) ta , (float) wait);
 
 //reset varibles
       queue_count--;
