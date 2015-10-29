@@ -3,26 +3,30 @@
 const int INT_MAX = 65000;
 const int array_size = 100;
 const int check = -1;
-
-void sjf (int count, int *sub, int *run)
+void
+sjf (int count, int *sub, int *run)
 {
+
   int clock = 0;
-  int proc_left = 0;
-  int next_proc = 0;
+ // int proc_left = count;
+ int proc_left = 0;
+ int next_proc = 0;
   int ta = 0, wait = 0, resp = 0;
-  int i = 0, j = 0, index = 0;
+  int i = 0, j =0, index = 0 ;
   int k = 0;
-  int queue_count = 0;
+  int queue_count=0;
   int next_clock, smallest;
   int queue[array_size];
   int time[array_size];
+//  int check =-1;
+//queue[0]= sub[0];
 
 //initilize array to -1
-  for (k = 0; k < array_size; k++)
-    {
-      queue[k] = check;
-      time[k] = check;
-    }
+for (k = 0; k < array_size; k++)
+{
+queue[k]= check;
+time[k]= check;
+}
 
 //loop through all processes
   while (proc_left < count)
@@ -30,30 +34,31 @@ void sjf (int count, int *sub, int *run)
 
       if (queue_count == 0 && sub[next_proc] > clock)
 	{
-	  clock = sub[next_proc];
-//              printf ("reset clock to %d: \n",clock );
+		clock = sub[next_proc];
+//		printf ("reset clock to %d: \n",clock );
 	}
 
-      while (clock >= sub[i] && next_proc < count)
+	while (clock >= sub[i] && next_proc < count)
 	{
 	  queue[i] = sub[i];
 	  time[i] = run[i];
 	  i++;
 	  queue_count++;
 	  next_proc++;
+//printf("i:%d\n",i);
 	}
 
 //sort
-      smallest = INT_MAX;
-      for (j = 0; j < array_size; j++)
-	{
-	  if (time[j] != check && time[j] < smallest)
-	    {
-	      smallest = time[j];
-	      index = j;
-	    }
-	}
+smallest = INT_MAX;
+for (j = 0; j < array_size; j++) {
+    if (time[j] != check && time[j] < smallest) {
+        smallest = time[j];
+        index = j;
+}
+}
 //end sort
+
+
 
       resp += clock - queue[index];
 
@@ -64,15 +69,13 @@ void sjf (int count, int *sub, int *run)
       clock = next_clock;
 //printf ("%d: %d :%.2f, %.2f, %.2f\n",index, next_proc,(float) resp / proc_left, (float) ta / proc_left, (float) wait / proc_left); 
 //printf ("%d: %d :%.2f, %.2f, %.2f\n",index, next_proc,(float) resp , (float) ta , (float) wait);
-
 //reset varibles
-      queue_count--;
-      proc_left++;
-      queue[index] = check;
-      time[index] = check;
+queue_count--;
+proc_left++;
+queue[index] = check;
+time[index] = check;
+//      next_proc++;
     }
-
-  printf ("Shortest Job First\n");
-  printf ("Avg. Resp.:%.2f, Avg. T.A:%.2f, Avg. Wait:%.2f\n",
-	  (float) resp / count, (float) ta / count, (float) wait / count);
+printf("Shortest Job First\n");
+  printf ("Avg. Resp.:%.2f, Avg. T.A:%.2f, Avg. Wait:%.2f\n", (float) resp / count, (float) ta / count, (float) wait / count);
 }
