@@ -1,6 +1,6 @@
 //Primary author: Miranda Workman
 //Assignment 5: CPU Scheduler Simulator
-//Round Robin scheduler
+//Round Robin
 
 /* Promise of Originality
 I promise that this source code file has, in its entirety, been
@@ -13,5 +13,5 @@ submitted the copy will receive a zero on this assignment.
 
 void rr(int count, int *sub, int *run)
 {
-
+	const int quantum = 100;
 }
