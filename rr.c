@@ -16,46 +16,54 @@ submitted the copy will receive a zero on this assignment.
 void rr (int count, int *sub, int *run)
 {
 	int quantum = 100;
-	int queue[count], rem_time[count];
-	int proc_left = count;
-	int clock = 0;
+	int ready[count], rem_time[count], last_wait[count];
 	int cur_proc = 0;
-	int turnaround = 0, wait = 0, response = 0;
+	int clock = sub[0];
 	int next_clock = 0;
+	int turnaround = 0, wait = 0, response = 0;
 	int i = 0;
 	int end = 0, round = 0;
-	//Copy submission and run times into arrays that I can change
-	for (i = 0; i < count; ++i)
-	{
-		queue[i] = sub[i];
-		rem_time[i] = run[i];
-	}
+	int fin_proc = 0;
 
-	while (proc_left > 0)
+	while ( fin_proc < count )
 	{
-		if (queue[cur_proc % count] > clock)
+        	//Check to see if there are "new" submissions
+		while (sub[i] <= clock  && i < count)
+	        {
+			ready[end] = sub[i];
+			rem_time[end] = run[i];
+			last_wait[end] = 0;
+			end = (end + 1) % count;
+            		++i;
+        	}
+		//Push clock forward if necessary
+		if (ready[cur_proc] < clock)
 		{
-			clock = queue[cur_proc];
+			clock = ready[cur_proc];
 		}
-		if (round < count)
-		{
-			response += clock - queue[cur_proc];
-		}
-		wait += clock - queue[cur_proc];
+
 		//If the process is shorter than the quantum, it will complete and we don't need to worry about it any more.
 		if (rem_time[cur_proc] <= quantum )
 		{
 			next_clock = clock + rem_time[cur_proc];
-			proc_left--;
-			turnaround += clock - queue[cur_proc];
+			++fin_proc;
+			turnaround += next_clock - ready[cur_proc];
 		}
 		else
 		{
 			next_clock = clock + quantum;
-			queue[ end % count ] = queue[cur_proc];
-			rem_time[ end % count ] = rem_time[cur_proc] - quantum;
-			++end;
+			ready[end] = ready[cur_proc];
+			rem_time[end] = rem_time[cur_proc] - quantum;
+			last_wait[end] = next_clock;
+			end = (end + 1) % count;
 		}
+		//Need this to somehow only increase the response time for the first time the process runs 
+        	if (i < count)
+		{
+			response += clock - ready[cur_proc];
+		}
+		//Need wait to subtract the previous wait time--otherwise it'll count multiple times.
+		wait += (clock - ready[cur_proc] - last_wait[cur_proc]);
 		cur_proc = (cur_proc + 1) % count;
 		clock = next_clock;
 		round++;
