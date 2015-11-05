@@ -16,7 +16,7 @@ submitted the copy will receive a zero on this assignment.
 void rr (int count, int *sub, int *run)
 {
 	int quantum = 100;
-	int ready[count], rem_time[count], last_wait[count];
+	int ready[count], rem_time[count], resubmit[count];
 	int cur_proc = 0;
 	int clock = sub[0];	//Start clock at first submission time
 	int next_clock = 0;
@@ -27,6 +27,8 @@ void rr (int count, int *sub, int *run)
 
 	while ( fin_proc < count )
 	{
+		//If the current position is empty and the next submission time
+		//is after the clock, push clock forward to that submission time
 		if ( ready[cur_proc] < 0 && sub[i] > clock )
 		{
 			clock = sub[i];
@@ -36,48 +38,53 @@ void rr (int count, int *sub, int *run)
 	        {
 			ready[end] = sub[i];
 			rem_time[end] = run[i];
-			last_wait[end] = 0;
+			resubmit[end] = 0;
 			end = (end + 1) % count;
             		++i;
         	}
-		//Push clock forward if necessary
-		/*if (ready[cur_proc] > clock)
-		{
-			clock = ready[cur_proc];
-		}*/
-			
 
-		//If the process is shorter than the quantum, it will complete and we don't need to worry about it any more.
+		//If the process is shorter than the quantum, it will complete
 		if (rem_time[cur_proc] <= quantum )
 		{
 			next_clock = clock + rem_time[cur_proc];
 			++fin_proc;
 			turnaround += next_clock - ready[cur_proc];
 		}
+		//If the process has remaining time, put it back in the ready queue
+		//at position end. Set the "new submit time" to the next_clock.
 		else
 		{
 			next_clock = clock + quantum;
 			ready[end] = ready[cur_proc];
 			rem_time[end] = rem_time[cur_proc] - quantum;
-			last_wait[end] = next_clock;
+			resubmit[end] = next_clock;
 			end = (end + 1) % count;
 		}
-		//Need this to somehow only increase the response time for the first time the process runs 
-        	if (last_wait[cur_proc] == 0)
+		
+		//If the process has not been resubmitted, increment the response time
+		//Wait is the difference between when the process started running and
+		//the submission time
+        	if (resubmit[cur_proc] == 0)
 		{
 			response += clock - ready[cur_proc];
+			wait += clock - ready[cur_proc];
 		}
-		//Need wait to subtract the previous wait time--otherwise it'll count multiple times.
-		wait += (clock - ready[cur_proc]) - last_wait[cur_proc];
+		//If the process has been run before, calculate wait: the difference
+		//between when the process started running this time and when it was
+		//put back in the ready queue. 
+		else
+			wait += clock - resubmit[cur_proc];
+		//trace statements
+		printf("clock =%d  ta:%d wait:%d response:%d\n", clock, turnaround, wait, response);
+
+		//Remove "current" process from ready queue
+		ready[cur_proc] = -1;
+		rem_time[cur_proc] = -1;
+		resubmit[cur_proc] = 0;
+
 		cur_proc = (cur_proc + 1) % count;
 		clock = next_clock;
-		//Remove the process that was either completed or put at the end of the queue
-		if (cur_proc != end)
-		{
-			ready[cur_proc - 1] = -1;
-			rem_time[cur_proc - 1] = -1;
-			last_wait[cur_proc -1] = -1;
-		}
+
 	}
 	printf("Round Robin with Time Quantum of %d\n", quantum);
 	printf ("Avg. Resp.:%.2f, Avg. T.A:%.2f, Avg. Wait:%.2f\n",(float) response / count, (float) turnaround / count, (float) wait / count);
