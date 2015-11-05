@@ -18,15 +18,19 @@ void rr (int count, int *sub, int *run)
 	int quantum = 100;
 	int ready[count], rem_time[count], last_wait[count];
 	int cur_proc = 0;
-	int clock = sub[0];
+	int clock = sub[0];	//Start clock at first submission time
 	int next_clock = 0;
 	int turnaround = 0, wait = 0, response = 0;
 	int i = 0;
-	int end = 0, round = 0;
+	int end = 0;
 	int fin_proc = 0;
 
 	while ( fin_proc < count )
 	{
+		if ( ready[cur_proc] < 0 && sub[i] > clock )
+		{
+			clock = sub[i];
+		}
         	//Check to see if there are "new" submissions
 		while (sub[i] <= clock  && i < count)
 	        {
@@ -37,10 +41,11 @@ void rr (int count, int *sub, int *run)
             		++i;
         	}
 		//Push clock forward if necessary
-		if (ready[cur_proc] < clock)
+		/*if (ready[cur_proc] > clock)
 		{
 			clock = ready[cur_proc];
-		}
+		}*/
+			
 
 		//If the process is shorter than the quantum, it will complete and we don't need to worry about it any more.
 		if (rem_time[cur_proc] <= quantum )
@@ -58,15 +63,21 @@ void rr (int count, int *sub, int *run)
 			end = (end + 1) % count;
 		}
 		//Need this to somehow only increase the response time for the first time the process runs 
-        	if (i < count)
+        	if (last_wait[cur_proc] == 0)
 		{
 			response += clock - ready[cur_proc];
 		}
 		//Need wait to subtract the previous wait time--otherwise it'll count multiple times.
-		wait += (clock - ready[cur_proc] - last_wait[cur_proc]);
+		wait += (clock - ready[cur_proc]) - last_wait[cur_proc];
 		cur_proc = (cur_proc + 1) % count;
 		clock = next_clock;
-		round++;
+		//Remove the process that was either completed or put at the end of the queue
+		if (cur_proc != end)
+		{
+			ready[cur_proc - 1] = -1;
+			rem_time[cur_proc - 1] = -1;
+			last_wait[cur_proc -1] = -1;
+		}
 	}
 	printf("Round Robin with Time Quantum of %d\n", quantum);
 	printf ("Avg. Resp.:%.2f, Avg. T.A:%.2f, Avg. Wait:%.2f\n",(float) response / count, (float) turnaround / count, (float) wait / count);
