@@ -46,7 +46,9 @@ void srtf(int count, int *sub, int *run)
 				elapsed = sub[x + 1] - sub[x];
 				if (elapsed > run[x])
 				{
-					while (time_left_others > 0 && elapsed > run[x])
+					elapsed = elapsed - run[x];
+					time_left_current = time_left_current - elapsed;
+					/*while (time_left_others > 0 && elapsed > run[x])
 					{
 						elapsed--;
 						time_left_others--;
@@ -55,7 +57,7 @@ void srtf(int count, int *sub, int *run)
 					{
 						//elapsed = elapsed - run[x];
 						time_left_current = time_left_current - elapsed;
-					}
+					}*/
 				}
 				else
 				{
