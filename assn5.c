@@ -45,7 +45,7 @@ printf("Please use this format: \"Submit time (space) Duration\"\n");
   fcfs (count, sub, run);
   sjf (count, sub, run);
   srtf(count, sub ,run);
-//      rr(count, sub ,run);
+  rr(count, sub ,run);
 //
 
 
