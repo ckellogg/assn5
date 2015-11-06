@@ -38,7 +38,7 @@ void rr (int count, int *sub, int *run)
 	        {
 			ready[end] = i;
 			rem_time[i] = run[i];
-			printf("Process %d added. ready=%d, time=%d\n", i, index, rem_time[i]);
+		//	printf("Process %d added. ready=%d, time=%d\n", i, index, rem_time[i]);
 			++size;
 			end = (end + 1) % count;
             		++i;
@@ -57,7 +57,7 @@ void rr (int count, int *sub, int *run)
 			size--;
 			turnaround += next_clock - sub[ready[index]];
 			wait += next_clock - sub[ready[index]] - run[ready[index]];
-			printf("Process %d finished at %d\n", ready[index], clock);
+		//	printf("Process %d finished at %d\n", ready[index], clock);
 		}
 		//If the process has remaining time, put it back in the ready queue. Rem time decrements by quantum.
 		else
@@ -75,12 +75,12 @@ void rr (int count, int *sub, int *run)
 			*/
 			ready[end] = ready[index];
 			rem_time[ready[index]] = rem_time[ready[index]] - quantum;
-			printf("Process %d added to end of queue, position %d. %d remaining.\n", ready[index], end, rem_time[ready[end]]);
+		//	printf("Process %d added to end of queue, position %d. %d remaining.\n", ready[index], end, rem_time[ready[end]]);
 			end = (end + 1) % count;
 //			printf("end %d ready[end] %d rem_time[end] %d\n", end, ready[end], rem_time[end] );
 		}
 
-		printf("job #%d, clock=%d, rem_time=%d, wait=%d, ta=%d, resp=%d\n\n", ready[index], clock, rem_time[ready[index]], wait, turnaround, response);
+	//	printf("job #%d, clock=%d, rem_time=%d, wait=%d, ta=%d, resp=%d\n\n", ready[index], clock, rem_time[ready[index]], wait, turnaround, response);
 		index = (index + 1) % count;
 		clock = next_clock;
 
