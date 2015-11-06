@@ -16,73 +16,72 @@ submitted the copy will receive a zero on this assignment.
 void rr (int count, int *sub, int *run)
 {
 	int quantum = 100;
-	int ready[count], rem_time[count], resubmit[count];
-	int cur_proc = 0;
-	int clock = sub[0];	//Start clock at first submission time
+	int ready[count], rem_time[count];
+	int index = 0;
+	int clock = 0;
 	int next_clock = 0;
 	int turnaround = 0, wait = 0, response = 0;
 	int i = 0;
 	int end = 0;
+	int size = 0;
 	int fin_proc = 0;
 
 	while ( fin_proc < count )
 	{
-		//If the current position is empty and the next submission time
-		//is after the clock, push clock forward to that submission time
-		if ( ready[cur_proc] < 0 && sub[i] > clock )
+		//If there aren't any processes currently ready, push clock forward until the next submission time
+		if ( size == 0 && sub[i] > clock )
 		{
 			clock = sub[i];
 		}
-        	//Check to see if there are "new" submissions
+        	//Check for new submissions
 		while (sub[i] <= clock  && i < count)
 	        {
-			ready[end] = sub[i];
-			rem_time[end] = run[i];
-			resubmit[end] = 0;
+			ready[end] = i;
+			rem_time[i] = run[i];
+		//	printf("Process %d added. ready=%d, time=%d\n", i, index, rem_time[i]);
+			++size;
 			end = (end + 1) % count;
             		++i;
         	}
 
+		//If remaining time is the same as the total run time, increase the response counter
+		if (rem_time[ready[index]] == run[ready[index]])
+			response += clock - sub[ready[index]];
+
+//		printf("current process=%d ready[curproc]=%d rem_time[curproc]=%d\n", cur_proc, ready[cur_proc], rem_time[cur_proc] );
 		//If the process is shorter than the quantum, it will complete
-		if (rem_time[cur_proc] <= quantum )
+		if (rem_time[ready[index]] <= quantum )
 		{
-			next_clock = clock + rem_time[cur_proc];
+			next_clock = clock + rem_time[ready[index]];
 			++fin_proc;
-			turnaround += next_clock - ready[cur_proc];
+			size--;
+			turnaround += next_clock - sub[ready[index]];
+			wait += next_clock - sub[ready[index]] - run[ready[index]];
+		//	printf("Process %d finished at %d\n", ready[index], clock);
 		}
-		//If the process has remaining time, put it back in the ready queue
-		//at position end. Set the "new submit time" to the next_clock.
+		//If the process has remaining time, put it back in the ready queue. Rem time decrements by quantum.
 		else
 		{
 			next_clock = clock + quantum;
-			ready[end] = ready[cur_proc];
-			rem_time[end] = rem_time[cur_proc] - quantum;
-			resubmit[end] = next_clock;
+			//check for submissions
+	/*			while (sub[i] <= clock && i < count)
+			{
+				ready[end] = i;
+				rem_time[i] = run[i];
+				printf("Process %d added. index=%d, end=%d, time-%d\n", i, index, end, rem_time[i]);
+				end = (end + 1) % count;
+				++i;
+			}
+			*/
+			ready[end] = ready[index];
+			rem_time[ready[index]] = rem_time[ready[index]] - quantum;
+		//	printf("Process %d added to end of queue, position %d. %d remaining.\n", ready[index], end, rem_time[ready[end]]);
 			end = (end + 1) % count;
+//			printf("end %d ready[end] %d rem_time[end] %d\n", end, ready[end], rem_time[end] );
 		}
-		
-		//If the process has not been resubmitted, increment the response time
-		//Wait is the difference between when the process started running and
-		//the submission time
-        	if (resubmit[cur_proc] == 0)
-		{
-			response += clock - ready[cur_proc];
-			wait += clock - ready[cur_proc];
-		}
-		//If the process has been run before, calculate wait: the difference
-		//between when the process started running this time and when it was
-		//put back in the ready queue. 
-		else
-			wait += clock - resubmit[cur_proc];
-		//trace statements
-		printf("clock =%d  ta:%d wait:%d response:%d\n", clock, turnaround, wait, response);
 
-		//Remove "current" process from ready queue
-		ready[cur_proc] = -1;
-		rem_time[cur_proc] = -1;
-		resubmit[cur_proc] = 0;
-
-		cur_proc = (cur_proc + 1) % count;
+	//	printf("job #%d, clock=%d, rem_time=%d, wait=%d, ta=%d, resp=%d\n\n", ready[index], clock, rem_time[ready[index]], wait, turnaround, response);
+		index = (index + 1) % count;
 		clock = next_clock;
 
 	}
