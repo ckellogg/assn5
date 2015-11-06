@@ -39,25 +39,36 @@ void rr (int count, int *sub, int *run)
 			ready[end] = sub[i];
 			rem_time[end] = run[i];
 			resubmit[end] = 0;
+			printf("Process %d added. ready=%d, time=%d\n", i, ready[end], rem_time[end]);
 			end = (end + 1) % count;
             		++i;
         	}
-
+		printf("current process=%d ready[curproc]=%d rem_time[curproc]=%d\n", cur_proc, ready[cur_proc], rem_time[cur_proc] );
 		//If the process is shorter than the quantum, it will complete
 		if (rem_time[cur_proc] <= quantum )
 		{
 			next_clock = clock + rem_time[cur_proc];
 			++fin_proc;
 			turnaround += next_clock - ready[cur_proc];
+			printf("Finished process submitted at %d\n", ready[cur_proc]);
 		}
 		//If the process has remaining time, put it back in the ready queue
 		//at position end. Set the "new submit time" to the next_clock.
 		else
 		{
 			next_clock = clock + quantum;
+			if (sub[i] <= next_clock && i < count)
+			{
+				ready[end] = sub[i];
+				rem_time[end] = run[i];
+				resubmit[end] = 0;
+				end = (end + 1) % count;
+				++i;
+			}
 			ready[end] = ready[cur_proc];
 			rem_time[end] = rem_time[cur_proc] - quantum;
 			resubmit[end] = next_clock;
+			printf("end %d ready[end] %d rem_time[end] %d\n", end, ready[end], rem_time[end] );
 			end = (end + 1) % count;
 		}
 		
